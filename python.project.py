@@ -1,73 +1,120 @@
-import tkinter as tk
-from tkinter import messagebox
-class Contact:
-    def __init__(self, name, phone, email):
-        self.name = name
-        self.phone = phone
-        self.email = email
+class Person:
+    def _init_(self, name):
+        self.__name = name  
 
-    def __str__(self):
-        return f"{self.name} | {self.phone} | {self.email}"
+    def get_name(self):
+        return self.__name
 
-class ContactBook:
-    def __init__(self):
-        self.contacts = []
+    def set_name(self, name):
+        self.__name = name
 
-    def add_contact(self, contact):
-        self.contacts.append(contact)
+class Student(Person):
+    def _init_(self, name, roll_no, branch):
+        super()._init_(name) 
+        self.__roll_no = roll_no
+        self.__branch = branch
 
-    def get_all_contacts(self):
-        return self.contacts
+    def get_roll_no(self):
+        return self.__roll_no
 
-class ContactBookGUI:
-    def __init__(self, root):
-        self.contact_book = ContactBook()
+    def get_branch(self):
+        return self.__branch
 
-        self.root = root
-        self.root.title("Contact Book")
+    def set_marks(self, branch):
+        self.__branch = branch
 
-        tk.Label(root, text="Name").grid(row=0, column=0)
-        tk.Label(root, text="Phone").grid(row=1, column=0)
-        tk.Label(root, text="Email").grid(row=2, column=0)
+   
+    def _str_(self):
+        return f"Student: {self.get_name()}, Roll No: {self._roll_no}, Branch: {self._branch}"
 
-        self.name_entry = tk.Entry(root)
-        self.phone_entry = tk.Entry(root)
-        self.email_entry = tk.Entry(root)
 
-        self.name_entry.grid(row=0, column=1)
-        self.phone_entry.grid(row=1, column=1)
-        self.email_entry.grid(row=2, column=1)
+class PGStudent(Student):
+    def _init_(self, name, roll_no,branch, thesis_topic):
+        super()._init_(name, roll_no, branch)
+        self.thesis_topic = thesis_topic
 
-        tk.Button(root, text="Add Contact", command=self.add_contact).grid(row=3, column=0, pady=10)
-        tk.Button(root, text="Show Contacts", command=self.show_contacts).grid(row=3, column=1, pady=10)
+    def _str_(self):
+        return f"PGrad Student: {self.get_name()}, Roll No: {self.get_roll_no()}, Branch: {self.get_branch()}, Thesis: {self.thesis_topic}"
 
-        self.contacts_listbox = tk.Listbox(root, width=50)
-        self.contacts_listbox.grid(row=4, column=0, columnspan=2)
 
-    def add_contact(self):
-        name = self.name_entry.get()
-        phone = self.phone_entry.get()
-        email = self.email_entry.get()
+class StudentManager:
+    def _init_(self):
+        self.__students = []
 
-        if name and phone and email:
-            contact = Contact(name, phone, email)
-            self.contact_book.add_contact(contact)
-            messagebox.showinfo("Success", "Contact added successfully!")
-            self.clear_entries()
+    def add_student(self, student):
+        self.__students.append(student)
+
+    def get_all_students(self):
+        return self.__students
+
+    def find_by_roll(self, roll_no):
+        for s in self.__students:
+            if s.get_roll_no() == roll_no:
+                return s
+        return None
+
+
+class App:
+    def _init_(self):
+        self.manager = StudentManager()
+
+    def run(self):
+        while True:
+            print("\n===== Student Management System =====")
+            print("1. Add Student")
+            print("2. Add PostGraduate Student")
+            print("3. View All Students")
+            print("4. Search Student by Roll No")
+            print("5. Exit")
+            choice = input("Enter choice: ")
+
+            if choice == '1':
+                self.add_student()
+            elif choice == '2':
+                self.add_Pgraduate_student()
+            elif choice == '3':
+                self.show_all_students()
+            elif choice == '4':
+                self.search_student()
+            elif choice == '5':
+                print("Goodbye!")
+                break
+            else:
+                print("Invalid choice!")
+
+    def add_student(self):
+        name = input("Enter name: ")
+        roll_no = input("Enter roll no: ")
+        branch = input("Enter branch: ")
+        student = Student(name, roll_no, branch)
+        self.manager.add_student(student)
+        print("Student added.")
+
+    def add_Pgraduate_student(self):
+        name = input("Enter name: ")
+        roll_no = input("Enter roll no: ")
+        branch = input("Enter branch: ")
+        thesis = input("Enter thesis topic: ")
+        grad_student = PGStudent(name, roll_no, branch, thesis)
+        self.manager.add_student(grad_student)
+        print("Graduate student added.")
+
+    def show_all_students(self):
+        students = self.manager.get_all_students()
+        if not students:
+            print("No students found.")
+        for s in students:
+            print(s)
+
+    def search_student(self):
+        roll_no = input("Enter roll no to search: ")
+        student = self.manager.find_by_roll(roll_no)
+        if student:
+            print("Found:", student)
         else:
-            messagebox.showwarning("Input Error", "Please fill in all fields")
+            print("Student not found.")
 
-    def show_contacts(self):
-        self.contacts_listbox.delete(0, tk.END)
-        for contact in self.contact_book.get_all_contacts():
-            self.contacts_listbox.insert(tk.END, str(contact))
 
-    def clear_entries(self):
-        self.name_entry.delete(0, tk.END)
-        self.phone_entry.delete(0, tk.END)
-        self.email_entry.delete(0, tk.END)
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = ContactBookGUI(root)
-    root.mainloop()
+if _name_ == "_main_":
+    app = App()
+    app.run()
